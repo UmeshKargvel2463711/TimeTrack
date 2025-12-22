@@ -2,8 +2,9 @@ import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js'
 import { AuthService } from '../../../core/services/auth.service';
+import { from } from 'rxjs';
 
 Chart.register(...registerables);
 
