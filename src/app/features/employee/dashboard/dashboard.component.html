@@ -1,49 +1,62 @@
 <div class="dashboard-wrapper">
-    <header class="main-header">
-        <div class="brand">
-            <div class="logo-box">🕒</div>
-            <div class="header-text">
-                <h1>TimeTrack</h1>
-                <span>Employee Dashboard</span>
+    <header class="navbar-modern">
+        <div class="nav-left">
+            <div class="logo-circle">🕒</div>
+            <div class="brand-info">
+                <h1 class="brand-name">TimeTrack</h1>
+                <span class="brand-tag">Employee Dashboard</span>
             </div>
         </div>
-        <div class="user-meta">
-            <div class="user-info">
-                <strong>{{ authService.currentUser()?.name }}</strong>
-                <p>{{ authService.currentUser()?.department || 'Engineering' }}</p>
+
+        <nav class="nav-center">
+            <button class="nav-item" [class.active]="activeTab() === 'logging'" (click)="setTab('logging')">
+                <span class="icon">🕒</span> Logs
+            </button>
+            <button class="nav-item" [class.active]="activeTab() === 'tasks'" (click)="setTab('tasks')">
+                <span class="icon">📋</span> Tasks
+            </button>
+            <button class="nav-item" [class.active]="activeTab() === 'productivity'" (click)="setTab('productivity')">
+                <span class="icon">📈</span> Insights
+            </button>
+            <button class="nav-item notif" [class.active]="activeTab() === 'notifications'"
+                (click)="setTab('notifications')">
+                <span class="icon">🔔</span> Notifications
+                <span class="notif-badge" *ngIf="unreadCount() > 0">{{unreadCount()}}</span>
+            </button>
+        </nav>
+
+        <div class="nav-right">
+            <div class="user-pill">
+                <div class="user-avatar">{{ authService.currentUser()?.name?.charAt(0) }}</div>
+                <div class="user-details">
+                    <span class="u-name">{{ authService.currentUser()?.name }}</span>
+                    <span class="u-dept">{{ authService.currentUser()?.department || 'Engineering' }}</span>
+                </div>
             </div>
-            <button class="logout-link" (click)="logout()">↪ Logout</button>
+            <button class="btn-logout" (click)="logout()" title="Logout">↪</button>
         </div>
     </header>
 
-    <nav class="tabs">
-        <button [class.active]="activeTab() === 'logging'" (click)="setTab('logging')">🕒 Time Logging</button>
-        <button [class.active]="activeTab() === 'tasks'" (click)="setTab('tasks')">📋 My Tasks</button>
-        <button [class.active]="activeTab() === 'productivity'" (click)="setTab('productivity')">📈
-            Productivity</button>
-        <button [class.active]="activeTab() === 'notifications'" (click)="setTab('notifications')" class="notif-tab">
-            🔔 Notifications <span class="badge" *ngIf="unreadCount() > 0">{{unreadCount()}}</span>
-        </button>
-    </nav>
-
     <div [ngSwitch]="activeTab()" class="tab-content">
-        <div *ngSwitchCase="'logging'">
+
+        <div *ngSwitchCase="'logging'" class="fade-in">
             <div class="stats-row">
-                <div class="card">
+                <div class="card stat-card">
                     <h3>Today's Hours</h3>
-                    <p>0 hrs</p>
+                    <p class="stat-number">0 hrs</p>
                 </div>
-                <div class="card">
+                <div class="card stat-card">
                     <h3>This Week</h3>
-                    <p>{{weeklyHours()}} hrs</p>
+                    <p class="stat-number">{{weeklyHours()}} hrs</p>
                 </div>
-                <div class="card">
+                <div class="card stat-card">
                     <h3>Days Logged</h3>
-                    <p>{{timeLogs().length}} days</p>
+                    <p class="stat-number">{{timeLogs().length}} days</p>
                 </div>
             </div>
+
             <div class="card table-card">
-                <div class="header-row">
+                <div class="card-header-row">
                     <h3>Time Logs</h3>
                     <button class="btn-primary" (click)="showModal.set(true)">+ Log Time</button>
                 </div>
@@ -63,23 +76,25 @@
                             <td>{{log.start}}</td>
                             <td>{{log.end}}</td>
                             <td>{{log.break}}m</td>
-                            <td><strong>{{log.total}} hrs</strong></td>
+                            <td><strong class="text-glow">{{log.total}} hrs</strong></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div *ngSwitchCase="'tasks'">
-            <div class="task-list">
+        <div *ngSwitchCase="'tasks'" class="fade-in">
+            <div class="task-grid">
                 <div *ngFor="let task of detailedTasks()" class="task-card card">
                     <div class="task-row">
                         <strong>{{task.title}}</strong>
                         <span class="pill" [attr.data-status]="task.status">{{task.status}}</span>
                     </div>
                     <div class="progress-info">
-                        <div class="labels"><span>Progress</span><span>{{task.currentHours}}/{{task.totalHours}}
-                                hrs</span></div>
+                        <div class="labels">
+                            <span>Progress</span>
+                            <span>{{task.currentHours}}/{{task.totalHours}} hrs</span>
+                        </div>
                         <div class="progress-bg">
                             <div class="progress-fill" [style.width.%]="task.progress"></div>
                         </div>
@@ -88,7 +103,7 @@
             </div>
         </div>
 
-        <div *ngSwitchCase="'productivity'">
+        <div *ngSwitchCase="'productivity'" class="fade-in">
             <div class="charts-grid">
                 <div class="card chart-box">
                     <h3>Daily Hours</h3><canvas #hoursChart></canvas>
@@ -99,16 +114,15 @@
             </div>
         </div>
 
-        <div *ngSwitchCase="'notifications'">
-            <div class="notifications-container">
-                <div class="header-row">
+        <div *ngSwitchCase="'notifications'" class="fade-in">
+            <div class="notifications-container card">
+                <div class="card-header-row">
                     <div class="title-group">
                         <h3>Notifications</h3>
-                        <span class="sub-text">{{ unreadCount() }} unread notifications</span>
+                        <span class="sub-text">{{ unreadCount() }} unread messages</span>
                     </div>
                     <button class="text-btn" (click)="markAllAsRead()">Mark all as read</button>
                 </div>
-
                 <div class="notification-list">
                     <div *ngFor="let note of detailedNotifications()" class="note-card-modern"
                         [ngClass]="[note.type, note.read ? 'read-state' : '']">
@@ -118,14 +132,10 @@
                             <span *ngIf="note.type === 'reminder'">🕒</span>
                         </div>
                         <div class="note-content">
-                            <div class="note-main">
-                                <strong>{{note.message}}</strong>
-                                <span class="note-time">{{note.timestamp}}</span>
-                            </div>
+                            <strong>{{note.message}}</strong>
+                            <span class="note-time">{{note.timestamp}}</span>
                         </div>
-                        <div class="note-action">
-                            <button class="check-icon" [class.checked]="note.read">✔</button>
-                        </div>
+                        <button class="check-icon" [class.checked]="note.read">✔</button>
                     </div>
                 </div>
             </div>
@@ -137,7 +147,7 @@
     <div class="modal-card">
         <div class="modal-header">
             <h2>TimeTrack System</h2>
-            <p>Daily Work Logging</p>
+            <p>Log your daily work hours</p>
         </div>
         <div class="modal-body">
             <div class="form-group">
@@ -145,16 +155,24 @@
                 <input type="date" [(ngModel)]="newLog.date" class="form-control">
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Start Time</label><input type="time" [(ngModel)]="newLog.start"
-                        class="form-control"></div>
-                <div class="form-group"><label>End Time</label><input type="time" [(ngModel)]="newLog.end"
-                        class="form-control"></div>
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" [(ngModel)]="newLog.start" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" [(ngModel)]="newLog.end" class="form-control">
+                </div>
             </div>
-            <div class="form-group"><label>Break Duration (Mins)</label><input type="number" [(ngModel)]="newLog.break"
-                    class="form-control"></div>
-            <div class="gap-display">Total Gap: <strong>{{ totalGap() }} Hours</strong></div>
-            <button class="btn-save-navy" (click)="saveLog()">Save Daily Log</button>
-            <button class="btn-cancel" (click)="showModal.set(false)">Cancel</button>
+            <div class="form-group">
+                <label>Break Duration (Mins)</label>
+                <input type="number" [(ngModel)]="newLog.break" class="form-control">
+            </div>
+            <div class="gap-display">Total Logged: <strong>{{ totalGap() }} Hours</strong></div>
+            <div class="modal-actions">
+                <button class="btn-save" (click)="saveLog()">Save Daily Log</button>
+                <button class="btn-cancel" (click)="showModal.set(false)">Cancel</button>
+            </div>
         </div>
     </div>
 </div>
