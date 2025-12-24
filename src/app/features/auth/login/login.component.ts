@@ -59,6 +59,17 @@ export class LoginComponent implements OnInit {
             this.error = '';
         }
     }
+    onSubmit() {
+        if (this.isLoginMode) {
+            const success = this.authService.login(this.authData.email, this.authData.password);
+            if (!success) {
+                alert('Invalid credentials');
+            }
+        } else {
+            // This call will now work because 'register' exists in the service
+            this.authService.register({ ...this.authData });
+        }
+    }
 
     private navigateByUserRole() {
         const user = this.authService.currentUser();

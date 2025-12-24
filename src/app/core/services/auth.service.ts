@@ -1,32 +1,63 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    // Signal to track the logged-in user state
+    private router = inject(Router);
+    private platformId = inject(PLATFORM_ID);
+
+    // This Signal updates the name in your dashboard header instantly
     currentUser = signal<any>(null);
 
+    constructor() {
+        // Check if running in browser to avoid localStorage errors in Node/Vite
+        if (isPlatformBrowser(this.platformId)) {
+            const savedUser = localStorage.getItem('user_session');
+            if (savedUser) {
+                this.currentUser.set(JSON.parse(savedUser));
+            }
+        }
+    }
+
+    // FIX: Explicitly defined register method to resolve TS2339
     register(userData: any) {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        users.push(userData);
-        localStorage.setItem('users', JSON.stringify(users));
+        if (isPlatformBrowser(this.platformId)) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+            // Add new user to the local storage 'database'
+            users.push(userData);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Auto-login: Set the signal so the Dashboard shows their name immediately
+            this.currentUser.set(userData);
+            localStorage.setItem('user_session', JSON.stringify(userData));
+
+            // Navigate to dashboard after registration
+            this.router.navigate(['/admin/dashboard']);
+        }
     }
 
     login(email: string, password: string): boolean {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const foundUser = users.find((u: any) => u.email === email && u.password === password);
+        if (isPlatformBrowser(this.platformId)) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const foundUser = users.find((u: any) => u.email === email && u.password === password);
 
-        if (foundUser) {
-            this.currentUser.set(foundUser);
-            localStorage.setItem('user_session', JSON.stringify(foundUser));
-            return true;
+            if (foundUser) {
+                this.currentUser.set(foundUser);
+                localStorage.setItem('user_session', JSON.stringify(foundUser));
+                this.router.navigate(['/admin/dashboard']);
+                return true;
+            }
         }
         return false;
     }
 
-    // ADD THIS METHOD: This fixes the TS2339 error
     logout() {
         this.currentUser.set(null);
-        localStorage.removeItem('user_session');
-        localStorage.removeItem('active_user');
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem('user_session');
+        }
+        this.router.navigate(['/login']);
     }
 }

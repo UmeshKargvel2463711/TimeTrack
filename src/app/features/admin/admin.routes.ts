@@ -1,9 +1,13 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '../../core/guards/admin.guard';
+// Ensure this path leads to the actual .ts file
+import { AdminDashboardComponent } from './dashboard/dashboard.component';
 
-export const ADMIN_ROUTES: Routes = [
+export const routes: Routes = [
+    // ... other routes
     {
-        path: 'dashboard',
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.AdminDashboardComponent)
-    },
-    { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+        path: 'admin/dashboard',
+        component: AdminDashboardComponent, // This now works because of the 'export'
+        canActivate: [adminGuard]
+    }
 ];

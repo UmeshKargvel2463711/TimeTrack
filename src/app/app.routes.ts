@@ -12,26 +12,31 @@ import { LandingComponent } from './features/auth/landing/landing.component';
 export const routes: Routes = [
     { path: '', redirectTo: 'landing', pathMatch: 'full' },
 
-    // Login page (only for guests)
+    // Public Pages (Accessible only when logged out)
     { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
     { path: 'landing', component: LandingComponent, canActivate: [guestGuard] },
 
-    // Role-specific protected routes
+    // Protected Admin Routes
     {
         path: 'admin/dashboard',
         component: AdminDashboardComponent,
         canActivate: [adminGuard]
     },
+
+    // Protected Manager Routes
     {
         path: 'manager/dashboard',
         component: ManagerDashboardComponent,
         canActivate: [managerGuard]
     },
+
+    // Protected Employee Routes
     {
         path: 'employee/dashboard',
         component: EmployeeDashboardComponent,
         canActivate: [employeeGuard]
     },
 
+    // Wildcard fallback
     { path: '**', redirectTo: 'login' }
 ];

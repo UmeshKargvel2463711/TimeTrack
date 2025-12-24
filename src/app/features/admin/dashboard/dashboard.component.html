@@ -1,1 +1,105 @@
-<p>dashboard works!</p>
+<div class="admin-container">
+    <header class="dashboard-header">
+        <div class="brand">
+            <div class="logo-box">🕒</div>
+            <div class="brand-text">
+                <h1>TimeTrack</h1>
+                <p>Admin Dashboard</p>
+            </div>
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                <strong class="user-name">{{ userProfile()?.name || 'Michael Brown' }}</strong>
+                <span class="user-dept">{{ userProfile()?.department || 'IT' }}</span>
+            </div>
+            <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-info">
+                <p>Total Users</p>
+                <h2>{{ usersList().length }}</h2>
+            </div>
+            <div class="stat-icon blue">👥</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-info">
+                <p>Active Users</p>
+                <h2>{{ usersList().length }}</h2>
+            </div>
+            <div class="stat-icon green">👤</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-info">
+                <p>Total Hours Logged</p>
+                <h2>39</h2>
+            </div>
+            <div class="stat-icon purple">📊</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-info">
+                <p>Total Tasks</p>
+                <h2>5</h2>
+            </div>
+            <div class="stat-icon orange">📈</div>
+        </div>
+    </div>
+
+    <div class="management-box">
+        <div class="table-header">
+            <h2>User Management</h2>
+            <button class="add-btn" (click)="toggleModal()">+ Add User</button>
+        </div>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (user of usersList(); track user.email) {
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.department }}</td>
+                    <td><span class="badge active">{{ user.status }}</span></td>
+                    <td>✏️ 🗑️</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (isModalOpen()) {
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Add New User</h3>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" [(ngModel)]="newUser.name" placeholder="Enter name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" [(ngModel)]="newUser.email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" [(ngModel)]="newUser.department" placeholder="Enter department">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" (click)="toggleModal()">Cancel</button>
+                <button class="save-btn" (click)="saveUser()">Save User</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
